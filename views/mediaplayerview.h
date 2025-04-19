@@ -8,6 +8,8 @@
 #include <QCheckBox>
 #include <QStackedWidget>
 #include <QVideoWidget>
+#include <QMediaPlayer>
+#include <QMediaMetaData>
 #include "../controllers/mediacontroller.h"
 
 namespace Ui {
@@ -25,7 +27,8 @@ public:
     void setController(MediaController *controller);
     QVideoWidget* getVideoWidget();
 
-private slots:
+public slots:
+    // 控制按钮槽
     void onPlayButtonClicked();
     void onPauseButtonClicked();
     void onStopButtonClicked();
@@ -34,12 +37,15 @@ private slots:
     void onPositionSliderMoved(int position);
     void onAutoPlayCheckBoxChanged(int state);
     
-    // 响应模型变化的槽
+    // 更新UI的槽
     void updateMetadata(const QMediaMetaData &metaData);
     void updateDuration(qint64 duration);
     void updatePosition(qint64 position);
     void updatePlaybackState(QMediaPlayer::PlaybackState state);
     void updateVideoVisibility(bool hasVideo);
+    
+    // 歌词相关槽
+    void updateLyric(const QString &currentLyric, const QString &nextLyric);
 
 private:
     Ui::MediaPlayerView *ui;

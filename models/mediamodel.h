@@ -8,6 +8,7 @@
 #include <QMediaMetaData>
 #include "../utils/mysqlite.h"
 #include "../utils/mymediaplayer.h"
+#include "../utils/lyricparser.h"
 
 class MediaModel : public QObject
 {
@@ -43,6 +44,7 @@ signals:
     void positionChanged(qint64 position);
     void playbackStateChanged(QMediaPlayer::PlaybackState state);
     void hasVideoChanged(bool hasVideo);
+    void lyricChanged(const QString &currentLyric, const QString &nextLyric);
 
 private slots:
     void handleMetadataChange();
@@ -59,6 +61,10 @@ private:
     int m_currentSongIndex;
     bool m_autoPlayEnabled;
     QStringList m_supportedExtensions;
+    LyricParser *m_lyricParser;
+    QString m_currentSongPath;
+
+    QString findLyricFile(const QString &mediaPath);
 };
 
 #endif // MEDIAMODEL_H

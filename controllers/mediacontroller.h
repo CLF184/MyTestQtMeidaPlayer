@@ -11,35 +11,40 @@ class MediaController : public QObject
 {
     Q_OBJECT
 public:
-    explicit MediaController(MediaModel *mediaModel, QObject *parent = nullptr);
+    explicit MediaController(MediaModel *model, QObject *parent = nullptr);
+    
+    // 设置视频输出
+    void setVideoOutput(QVideoWidget *videoOutput);
     
     // 播放控制
     void play();
     void pause();
     void stop();
     void setVolume(int volume);
-    void setPosition(int position);
-    void setVideoOutput(QVideoWidget *videoWidget);
+    void setPosition(int seconds);
     void setAutoPlayEnabled(bool enabled);
 
 signals:
-    // 转发模型的信号给视图
+    // 转发模型信号给视图
     void metadataChanged(const QMediaMetaData &metaData);
     void durationChanged(qint64 duration);
     void positionChanged(qint64 position);
     void playbackStateChanged(QMediaPlayer::PlaybackState state);
     void hasVideoChanged(bool hasVideo);
-
-private slots:
-    // 处理模型信号
-    void onMetadataChanged(const QMediaMetaData &metaData);
-    void onDurationChanged(qint64 duration);
-    void onPositionChanged(qint64 position);
-    void onPlaybackStateChanged(QMediaPlayer::PlaybackState state);
-    void onHasVideoChanged(bool hasVideo);
+    
+    // 歌词信号
+    void lyricChanged(const QString &currentLyric, const QString &nextLyric);
 
 private:
-    MediaModel *m_mediaModel;
+    MediaModel *m_model;
+    
+private slots:
+    // 接收模型信号并处理
+    void handleMetadataChange(const QMediaMetaData &metaData);
+    void handleDurationChange(qint64 duration);
+    void handlePositionChange(qint64 position);
+    void handlePlaybackStateChange(QMediaPlayer::PlaybackState state);
+    void handleMediaStatusChange(QMediaPlayer::MediaStatus status);
 };
 
 #endif // MEDIACONTROLLER_H

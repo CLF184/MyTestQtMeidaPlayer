@@ -17,7 +17,8 @@ SOURCES += \
     views/mediaplayerview.cpp \
     views/playlistview.cpp \
     utils/mymediaplayer.cpp \
-    utils/mysqlite.cpp
+    utils/mysqlite.cpp \
+    utils/lyricparser.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -28,7 +29,8 @@ HEADERS += \
     views/mediaplayerview.h \
     views/playlistview.h \
     utils/mymediaplayer.h \
-    utils/mysqlite.h
+    utils/mysqlite.h \
+    utils/lyricparser.h
 
 FORMS += \
     mainwindow.ui \

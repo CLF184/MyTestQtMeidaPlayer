@@ -23,6 +23,10 @@ MediaPlayerView::MediaPlayerView(QWidget *parent) :
     // 默认显示封面
     ui->mediaWidget->setCurrentWidget(m_coverArtLabel);
     
+    // 初始化歌词标签
+    ui->currentLyricLabel->setText("暂无歌词");
+    ui->nextLyricLabel->setText("");
+    
     // 连接信号和槽
     connect(ui->playButton, &QPushButton::clicked, this, &MediaPlayerView::onPlayButtonClicked);
     connect(ui->pauseButton, &QPushButton::clicked, this, &MediaPlayerView::onPauseButtonClicked);
@@ -59,6 +63,10 @@ void MediaPlayerView::setController(MediaController *controller)
                 this, &MediaPlayerView::updatePlaybackState);
         connect(m_controller, &MediaController::hasVideoChanged, 
                 this, &MediaPlayerView::updateVideoVisibility);
+        
+        // 连接歌词信号
+        connect(m_controller, &MediaController::lyricChanged,
+                this, &MediaPlayerView::updateLyric);
     }
 }
 
@@ -193,4 +201,15 @@ void MediaPlayerView::formatTimeLabel(QLabel *label, qint64 timeInMs)
     QTime time(hours, minutes, seconds);
     QString format = hours > 0 ? "h:mm:ss" : "mm:ss";
     label->setText(time.toString(format));
+}
+
+void MediaPlayerView::updateLyric(const QString &currentLyric, const QString &nextLyric)
+{
+    if (currentLyric.isEmpty()) {
+        ui->currentLyricLabel->setText("暂无歌词");
+    } else {
+        ui->currentLyricLabel->setText(currentLyric);
+    }
+    
+    ui->nextLyricLabel->setText(nextLyric);
 }
