@@ -117,7 +117,7 @@ void PlaylistView::onSearchClicked()
     // 显示搜索开始的消息
     QMessageBox msgBox;
     msgBox.setWindowTitle(tr("搜索中"));
-    msgBox.setText(tr("正在搜索音乐文件，请稍候..."));
+    msgBox.setText(tr("正在搜索媒体文件，请稍候..."));
     msgBox.setStandardButtons(QMessageBox::NoButton);
     
     // 在不阻塞UI的情况下显示消息框
