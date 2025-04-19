@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -19,21 +20,30 @@ MainWindow::MainWindow(QWidget *parent)
     
     // 创建主布局
     QWidget *centralWidget = new QWidget(this);
-    QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
+    QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
     
-    // 添加视图到主布局
-    mainLayout->addWidget(m_playlistView);
-    mainLayout->addWidget(m_mediaPlayerView);
+    // 创建上部布局（播放列表和媒体播放器）
+    QHBoxLayout *topLayout = new QHBoxLayout();
+    topLayout->addWidget(m_playlistView);
+    topLayout->addWidget(m_mediaPlayerView);
     
     // 设置布局比例
-    mainLayout->setStretch(0, 1);  // 播放列表视图占30%
-    mainLayout->setStretch(1, 2);  // 媒体播放器视图占70%
+    topLayout->setStretch(0, 1);  // 播放列表视图占30%
+    topLayout->setStretch(1, 2);  // 媒体播放器视图占70%
+    
+    // 添加布局到主布局
+    mainLayout->addLayout(topLayout);
+    mainLayout->addWidget(m_lyricView); // 添加歌词视图到主布局底部
+    
+    // 设置布局比例
+    mainLayout->setStretch(0, 3); // 上部区域占75%
+    mainLayout->setStretch(1, 1); // 歌词区域占25%
     
     // 设置中央部件
     setCentralWidget(centralWidget);
     
     // 设置最小窗口大小
-    setMinimumSize(800, 500);
+    setMinimumSize(800, 750);
 }
 
 MainWindow::~MainWindow()
@@ -57,10 +67,15 @@ void MainWindow::setupViews()
 {
     m_playlistView = new PlaylistView(this);
     m_mediaPlayerView = new MediaPlayerView(this);
+    m_lyricView = new LyricView(this);
     
     // 设置视图的控制器
     m_playlistView->setController(m_playlistController);
     m_mediaPlayerView->setController(m_mediaController);
+    
+    // 连接歌词信号
+    connect(m_mediaController, &MediaController::lyricChanged,
+            m_lyricView, &LyricView::updateLyric);
 }
 
 void MainWindow::setupConnections()

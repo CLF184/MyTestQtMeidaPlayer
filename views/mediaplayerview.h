@@ -43,9 +43,6 @@ public slots:
     void updatePosition(qint64 position);
     void updatePlaybackState(QMediaPlayer::PlaybackState state);
     void updateVideoVisibility(bool hasVideo);
-    
-    // 歌词相关槽
-    void updateLyric(const QString &currentLyric, const QString &nextLyric);
 
 private:
     Ui::MediaPlayerView *ui;

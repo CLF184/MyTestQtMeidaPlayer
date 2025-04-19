@@ -8,6 +8,7 @@
 #include "controllers/playlistcontroller.h"
 #include "views/mediaplayerview.h"
 #include "views/playlistview.h"
+#include "views/lyricview.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,6 +36,7 @@ private:
     // 视图
     MediaPlayerView *m_mediaPlayerView;
     PlaylistView *m_playlistView;
+    LyricView *m_lyricView;
     
     void setupModels();
     void setupControllers();

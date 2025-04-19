@@ -1,0 +1,10 @@
+build/
+bin/
+.vscode/
+.vs/
+obj/
+debug/
+release/
+views/mediaplayerview.h
+untitled.pro.user
+ui_mainwindow.h

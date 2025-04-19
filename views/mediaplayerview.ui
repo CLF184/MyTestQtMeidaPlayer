@@ -25,41 +25,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="lyricBox">
-     <property name="title">
-      <string>歌词</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QLabel" name="currentLyricLabel">
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-        <property name="styleSheet">
-         <string>font-size: 14pt; color: #336699; font-weight: bold;</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="nextLyricLabel">
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-        <property name="styleSheet">
-         <string>font-size: 12pt; color: #999999;</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QSlider" name="positionSlider">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -145,7 +110,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QLabel" name="titleLabel">
          <property name="font">

@@ -16,6 +16,7 @@ SOURCES += \
     controllers/playlistcontroller.cpp \
     views/mediaplayerview.cpp \
     views/playlistview.cpp \
+    views/lyricview.cpp \
     utils/mymediaplayer.cpp \
     utils/mysqlite.cpp \
     utils/lyricparser.cpp
@@ -28,6 +29,7 @@ HEADERS += \
     controllers/playlistcontroller.h \
     views/mediaplayerview.h \
     views/playlistview.h \
+    views/lyricview.h \
     utils/mymediaplayer.h \
     utils/mysqlite.h \
     utils/lyricparser.h
@@ -35,7 +37,8 @@ HEADERS += \
 FORMS += \
     mainwindow.ui \
     views/mediaplayerview.ui \
-    views/playlistview.ui
+    views/playlistview.ui \
+    views/lyricview.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
