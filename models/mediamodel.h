@@ -8,7 +8,7 @@
 #include <QMediaMetaData>
 #include "../utils/mysqlite.h"
 #include "../utils/mymediaplayer.h"
-#include "../utils/lyricparser.h"
+#include "../models/lyricmodel.h" // 添加此行
 
 class MediaModel : public QObject
 {
@@ -44,7 +44,8 @@ signals:
     void positionChanged(qint64 position);
     void playbackStateChanged(QMediaPlayer::PlaybackState state);
     void hasVideoChanged(bool hasVideo);
-    void lyricChanged(const QString &currentLyric, const QString &nextLyric);
+    // 添加新信号，用于通知媒体文件路径变化
+    void lyricChanged(const QString &path,const QMediaMetaData &metadata);
 
 private slots:
     void handleMetadataChange();
@@ -52,6 +53,7 @@ private slots:
     void handleDurationChange(qint64 duration);
     void handlePlaybackStateChange(QMediaPlayer::PlaybackState state);
     void handleMediaStatusChange(QMediaPlayer::MediaStatus status);
+    void handelLyricChanged();
 
 private:
     mysqlite *m_db;
@@ -61,9 +63,9 @@ private:
     int m_currentSongIndex;
     bool m_autoPlayEnabled;
     QStringList m_supportedExtensions;
-    LyricParser *m_lyricParser;
     QString m_currentSongPath;
-
+    
+    // 此方法可以删除，或保留但简化实现
     QString findLyricFile(const QString &mediaPath);
 };
 

@@ -10,7 +10,6 @@ MediaController::MediaController(MediaModel *model, QObject *parent)
         connect(m_model, &MediaModel::durationChanged, this, &MediaController::handleDurationChange);
         connect(m_model, &MediaModel::positionChanged, this, &MediaController::handlePositionChange);
         connect(m_model, &MediaModel::playbackStateChanged, this, &MediaController::handlePlaybackStateChange);
-        connect(m_model, &MediaModel::lyricChanged, this, &MediaController::lyricChanged);
     }
 }
 
@@ -89,5 +88,7 @@ void MediaController::handlePlaybackStateChange(QMediaPlayer::PlaybackState stat
 
 void MediaController::handleMediaStatusChange(QMediaPlayer::MediaStatus status)
 {
+    // 使用参数以避免警告
+    Q_UNUSED(status);
     // 可以根据需要处理媒体状态变化
 }

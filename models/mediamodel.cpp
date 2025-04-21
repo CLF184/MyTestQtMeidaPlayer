@@ -21,8 +21,7 @@ MediaModel::MediaModel(QObject *parent)
     // 支持的媒体文件格式
     m_supportedExtensions = {"mp3", "flac", "wav", "mkv", "mp4"};
     
-    // 初始化歌词解析器
-    m_lyricParser = new LyricParser(this);
+    // 移除歌词解析器初始化
     
     // 连接信号和槽
     connect(m_db, &mysqlite::songChanged, this, &MediaModel::mediaChanged);
@@ -31,6 +30,7 @@ MediaModel::MediaModel(QObject *parent)
     connect(m_player, &QMediaPlayer::durationChanged, this, &MediaModel::handleDurationChange);
     connect(m_player, &QMediaPlayer::playbackStateChanged, this, &MediaModel::handlePlaybackStateChange);
     connect(m_player, &QMediaPlayer::mediaStatusChanged, this, &MediaModel::handleMediaStatusChange);
+    connect(m_player, &QMediaPlayer::metaDataChanged, this, &MediaModel::handelLyricChanged);
 }
 
 MediaModel::~MediaModel()
@@ -122,25 +122,16 @@ void MediaModel::setCurrentSongIndex(int index)
             m_currentSongPath = path;
             setMedia(path);
             
-            // 尝试加载歌词
-            QString lyricPath = findLyricFile(path);
-            if (!lyricPath.isEmpty()) {
-                if (m_lyricParser->loadFromFile(lyricPath)) {
-                    qDebug() << "成功加载歌词文件:" << lyricPath;
-                } else {
-                    qDebug() << "加载歌词文件失败:" << lyricPath;
-                    m_lyricParser->clear();
-                    emit lyricChanged("暂无歌词", "");
-                }
-            } else {
-                qDebug() << "未找到歌词文件";
-                m_lyricParser->clear();
-                emit lyricChanged("暂无歌词", "");
-            }
+            // 发送媒体路径变化信号，而不是直接处理歌词
+            //emit mediaPathChanged(path,m_player->metaData());
             
             emit currentSongChanged(index);
         }
     }
+}
+
+void MediaModel::handelLyricChanged(){
+    emit lyricChanged(m_currentSongPath,m_player->metaData());
 }
 
 int MediaModel::getCurrentSongIndex() const
@@ -202,44 +193,18 @@ void MediaModel::playNext()
     }
 }
 
-QString MediaModel::findLyricFile(const QString &mediaPath)
-{
-    if (mediaPath.isEmpty())
-        return QString();
+// 简化 findLyricFile 方法，仅作为辅助功能保留
+// QString MediaModel::findLyricFile(const QString &mediaPath)
+// {
+//     if (mediaPath.isEmpty())
+//         return QString();
     
-    QFileInfo mediaFileInfo(mediaPath);
-    QString baseName = mediaFileInfo.completeBaseName();
-    QString dirPath = mediaFileInfo.dir().path();
-
-    QString title = m_player->metaData().value(QMediaMetaData::AudioBitRate).toString();
-    QString artist = m_player->metaData().value(QMediaMetaData::Title).toString();
+//     QString title = m_player->metaData().value(QMediaMetaData::Title).toString();
+//     QString artist = m_player->metaData().value(QMediaMetaData::ContributingArtist).toString();
     
-    // 先尝试同名的.lrc文件
-    QString lrcPath = dirPath + "/" + baseName + ".lrc";
-    if (QFileInfo::exists(lrcPath)) {
-        return lrcPath;
-    }
-
-    lrcPath = dirPath + "/" + artist + "- "+ title + ".lrc";
-    if (QFileInfo::exists(lrcPath)) {
-        return lrcPath;
-    }
-    
-    // 再尝试同目录下所有.lrc文件，查找文件名包含媒体文件名的歌词文件
-    QDir dir(dirPath);
-    QStringList filters;
-    filters << "*.lrc";
-    dir.setNameFilters(filters);
-    
-    QStringList lrcFiles = dir.entryList();
-    for (const QString &lrcFile : lrcFiles) {
-        if (lrcFile.contains(title, Qt::CaseInsensitive)) {
-            return dirPath + "/" + lrcFile;
-        }
-    }
-    
-    return QString();
-}
+//     // 使用 LyricModel 的静态方法
+//     return LyricModel::findLyricFile(mediaPath, title, artist);
+// }
 
 void MediaModel::handleMetadataChange()
 {
@@ -251,11 +216,7 @@ void MediaModel::handlePositionChange(qint64 position)
 {
     emit positionChanged(position);
     
-    // 更新歌词显示
-    if (m_lyricParser->isLoaded()) {
-        QPair<QString, QString> lyrics = m_lyricParser->getCurrentAndNextLyric(position);
-        emit lyricChanged(lyrics.first, lyrics.second);
-    }
+    // 移除歌词更新代码
     
     // 自动播放下一首
     if (m_autoPlayEnabled && m_player->duration() > 0 && 

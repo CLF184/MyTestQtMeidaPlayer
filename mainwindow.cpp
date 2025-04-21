@@ -6,16 +6,17 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_mediaPlayerManager(new MediaPlayerManager(this))
+    , m_playlistManager(new PlaylistManager(this))
+    , m_lyricManager(new LyricManager(this))
 {
     ui->setupUi(this);
     
     // 设置窗口标题
     setWindowTitle(tr("音乐播放器"));
     
-    // 初始化MVC组件
-    setupModels();
-    setupControllers();
-    setupViews();
+    // 初始化managers和连接
+    setupManagers();
     setupConnections();
     
     // 创建主布局
@@ -24,8 +25,8 @@ MainWindow::MainWindow(QWidget *parent)
     
     // 创建上部布局（播放列表和媒体播放器）
     QHBoxLayout *topLayout = new QHBoxLayout();
-    topLayout->addWidget(m_playlistView);
-    topLayout->addWidget(m_mediaPlayerView);
+    topLayout->addWidget(m_playlistManager->getPlaylistView());
+    topLayout->addWidget(m_mediaPlayerManager->getMediaPlayerView());
     
     // 设置布局比例
     topLayout->setStretch(0, 1);  // 播放列表视图占30%
@@ -33,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     
     // 添加布局到主布局
     mainLayout->addLayout(topLayout);
-    mainLayout->addWidget(m_lyricView); // 添加歌词视图到主布局底部
+    mainLayout->addWidget(m_lyricManager->getLyricView()); 
     
     // 设置布局比例
     mainLayout->setStretch(0, 3); // 上部区域占75%
@@ -51,43 +52,35 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::setupModels()
+void MainWindow::setupManagers()
 {
-    m_playlistModel = new PlaylistModel(this);
-    m_mediaModel = new MediaModel(this);
-}
-
-void MainWindow::setupControllers()
-{
-    m_playlistController = new PlaylistController(m_playlistModel, m_mediaModel, this);
-    m_mediaController = new MediaController(m_mediaModel, this);
-}
-
-void MainWindow::setupViews()
-{
-    m_playlistView = new PlaylistView(this);
-    m_mediaPlayerView = new MediaPlayerView(this);
-    m_lyricView = new LyricView(this);
+    // 初始化媒体播放器系统
+    m_mediaPlayerManager->initialize(nullptr);
     
-    // 设置视图的控制器
-    m_playlistView->setController(m_playlistController);
-    m_mediaPlayerView->setController(m_mediaController);
+    // 初始化播放列表系统，传入媒体模型
+    m_playlistManager->initialize(m_mediaPlayerManager->getMediaModel(), nullptr);
     
-    // 连接歌词信号
-    connect(m_mediaController, &MediaController::lyricChanged,
-            m_lyricView, &LyricView::updateLyric);
+    // 初始化歌词系统
+    m_lyricManager->initialize(m_mediaPlayerManager->getMediaModel()->getPlayer(), nullptr);
 }
 
 void MainWindow::setupConnections()
 {
-    // 当选择播放列表时，加载其中的歌曲
-    connect(m_playlistView, &PlaylistView::playlistSelected, m_playlistController, &PlaylistController::selectPlaylist);
+    // 原有的连接
+    connect(m_mediaPlayerManager->getMediaController(), &MediaController::lyricChanged,
+            m_lyricManager->getLyricView(), &LyricView::updateLyric);
+            
+    // 添加从MediaPlayer到LyricController的跨模块连接
+    QMediaPlayer *player = m_mediaPlayerManager->getMediaModel()->getPlayer();
+    LyricController *lyricController = m_lyricManager->getLyricController();
     
-    // 当选择歌曲时，通知控制器播放歌曲
-    connect(m_playlistView, &PlaylistView::songSelected, [this](int /*songId*/) {
-        // 添加注释以说明参数未使用
-        // 这里可以添加任何在歌曲选中时需要执行的额外逻辑
-    });
+    // 播放位置变化时更新歌词
+    connect(player, &QMediaPlayer::positionChanged, 
+            lyricController, &LyricController::onPositionChanged);
+    
+    // 保留这个连接：媒体路径变化信号连接到歌词控制器
+    connect(m_mediaPlayerManager->getMediaModel(), &MediaModel::lyricChanged,
+            lyricController, &LyricController::onLyricChanged);
 }
 
 
