@@ -1,14 +1,10 @@
 #include "sendcontroller.h"
 #include <QMessageBox>
-#include <QFuture>
-#include <QDirIterator>
-#include <QFileInfo>
-#include <QtConcurrent>
 
 SendController::SendController(SendModel *model, SendView *view, QObject *parent)
     : QObject(parent),
-      m_model(model),
-      m_view(view)
+    m_model(model),
+    m_view(view)
 {
     // 连接视图信号到控制器槽
     connect(m_view, &SendView::sendRequested, this, &SendController::handleSendRequest);
@@ -16,8 +12,7 @@ SendController::SendController(SendModel *model, SendView *view, QObject *parent
     connect(m_view, &SendView::addFilesRequested, this, &SendController::handleAddFiles);
     connect(m_view, &SendView::removeFileRequested, this, &SendController::handleRemoveFile);
     connect(m_view, &SendView::clearFilesRequested, this, &SendController::handleClearFiles);
-    connect(m_view, &SendView::addPathRequested,this, &SendController::handleAddPath);
-    
+
     // 连接模型信号到控制器槽
     connect(m_model, &SendModel::transferStarted, this, &SendController::handleTransferStarted);
     connect(m_model, &SendModel::transferProgress, this, &SendController::handleTransferProgress);
@@ -25,7 +20,7 @@ SendController::SendController(SendModel *model, SendView *view, QObject *parent
     connect(m_model, &SendModel::transferCompleted, this, &SendController::handleTransferCompleted);
     connect(m_model, &SendModel::transferCancelled, this, &SendController::handleTransferCancelled);
     connect(m_model, &SendModel::transferError, this, &SendController::handleTransferError);
-    
+
     // 初始化视图
     updateFileList();
 }
@@ -39,52 +34,10 @@ void SendController::handleSendRequest()
     // 设置目标地址和端口
     m_model->setTargetAddress(m_view->getTargetIP());
     m_model->setTargetPort(m_view->getTargetPort());
-    
+
     // 开始传输
     if (!m_model->startTransfer()) {
         QMessageBox::warning(m_view, "错误", "无法开始传输，请检查文件列表和网络设置");
-    }
-}
-
-void SendController::handleAddPath(const QString &path)
-{
-    if (path.isEmpty()) {
-        return;
-    }
-    
-    QStringList filepaths;
-    QFuture<void> future = QtConcurrent::run([=, &filepaths]() {
-        // 使用QDirIterator进行递归搜索
-        // QDirIterator::Subdirectories 标志使迭代器递归进入子目录
-        QDirIterator it(path, QDirIterator::Subdirectories);
-        while (it.hasNext()) {
-            QString filePath = it.next();
-            QFileInfo fileInfo(filePath);
-            // 只检查文件
-            if (fileInfo.isFile()) {
-                filepaths.append(fileInfo.filePath());
-                qDebug() << "找到文件:" << fileInfo.filePath();
-            }
-        }
-    });
-    
-    future.waitForFinished();
-    
-    if (filepaths.isEmpty()) {
-        qDebug() << "在目录" << path << "及其子目录中没有找到文件";
-    } else {
-        qDebug() << "共找到" << filepaths.size() << "个文件";
-    }
-    
-    bool anyAdded = false;
-    for (const QString &path : filepaths) {
-        if(m_model->addFile(path)){
-            anyAdded = true;
-        }
-    }
-    if (anyAdded) {
-        m_model->setParentPath(path);
-        updateFileList();
     }
 }
 
@@ -101,15 +54,59 @@ void SendController::handleAddFiles(const QStringList &filePaths)
             anyAdded = true;
         }
     }
-    
+
     if (anyAdded) {
         updateFileList();
     }
 }
 
+
+
 void SendController::handleRemoveFile(int index)
 {
     if (m_model->removeFile(index)) {
+        updateFileList();
+    }
+}
+
+void SendController::handleAddPath(const QString &path)
+{
+    if (path.isEmpty()) {
+        return;
+    }
+
+    QStringList filepaths;
+    QFuture<void> future = QtConcurrent::run([=, &filepaths]() {
+        // 使用QDirIterator进行递归搜索
+        // QDirIterator::Subdirectories 标志使迭代器递归进入子目录
+        QDirIterator it(path, QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+            QString filePath = it.next();
+            QFileInfo fileInfo(filePath);
+            // 只检查文件
+            if (fileInfo.isFile()) {
+                filepaths.append(fileInfo.filePath());
+                qDebug() << "找到文件:" << fileInfo.filePath();
+            }
+        }
+    });
+
+    future.waitForFinished();
+
+    if (filepaths.isEmpty()) {
+        qDebug() << "在目录" << path << "及其子目录中没有找到文件";
+    } else {
+        qDebug() << "共找到" << filepaths.size() << "个文件";
+    }
+
+    bool anyAdded = false;
+    for (const QString &path : filepaths) {
+        if(m_model->addFile(path)){
+            anyAdded = true;
+        }
+    }
+    if (anyAdded) {
+        m_model->setParentPath(path);
         updateFileList();
     }
 }
@@ -128,23 +125,8 @@ void SendController::handleTransferStarted()
 
 void SendController::handleTransferProgress(int fileIndex, qint64 bytesSent, qint64 bytesTotal)
 {
-    // 只在文件发送完成时更新进度，而不是每次发送数据块都更新
-    if (bytesSent == bytesTotal) {
-        // 计算完成文件数占总文件数的百分比
-        QList<FileItem> files = m_model->getFiles();
-        int totalFiles = files.size();
-        int completedFiles = 0;
-        
-        for (const FileItem &file : files) {
-            if (file.status == FileStatus::Completed) {
-                completedFiles++;
-            }
-        }
-        
-        int progressPercentage = totalFiles > 0 ? (completedFiles * 100) / totalFiles : 0;
-        m_view->updateProgress(fileIndex, bytesSent, bytesTotal, progressPercentage);
-        updateFileList();
-    }
+    m_view->updateProgress(fileIndex, bytesSent, bytesTotal);
+    updateFileList();
 }
 
 void SendController::handleFileCompleted(int fileIndex)
@@ -153,23 +135,8 @@ void SendController::handleFileCompleted(int fileIndex)
     if (fileIndex >= 0 && fileIndex < files.size()) {
         QString fileName = files[fileIndex].fileName;
         m_view->setStatusMessage(QString("文件 %1 发送完成").arg(fileName));
-        
-        // 计算完成文件数占总文件数的百分比
-        int totalFiles = files.size();
-        int completedFiles = 0;
-        
-        for (const FileItem &file : files) {
-            if (file.status == FileStatus::Completed) {
-                completedFiles++;
-            }
-        }
-        
-        int progressPercentage = totalFiles > 0 ? (completedFiles * 100) / totalFiles : 0;
-        m_view->updateOverallProgress(progressPercentage, completedFiles, totalFiles);
-        
-        // 更新文件列表和界面状态
-        updateFileList();
     }
+    updateFileList();
 }
 
 void SendController::handleTransferCompleted()

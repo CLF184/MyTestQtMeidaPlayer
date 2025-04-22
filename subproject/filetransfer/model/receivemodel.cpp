@@ -190,7 +190,8 @@ void ReceiveModel::onReadyRead()
         in >> fileSize;
         
         // 验证文件大小
-        if (fileSize <= 0 || fileSize > 4LL * 1024 * 1024 * 1024) { // 限制最大4GB
+        //if (fileSize <= 0 || fileSize > 4LL * 1024 * 1024 * 1024) { // 限制最大4GB
+        if (fileSize <= 0) {
             emit errorOccurred(tr("接收到无效的文件大小: %1").arg(fileSize));
             socket->disconnectFromHost();
             return;

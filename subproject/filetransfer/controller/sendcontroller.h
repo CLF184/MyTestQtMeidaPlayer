@@ -2,6 +2,9 @@
 #define SENDCONTROLLER_H
 
 #include <QObject>
+#include <QDirIterator>
+#include <QFileInfo>
+#include <QtConcurrent>
 #include "../model/sendmodel.h"
 #include "../views/sendview.h"
 

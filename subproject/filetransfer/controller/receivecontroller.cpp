@@ -77,9 +77,10 @@ bool ReceiveController::isValidDataSize(qint64 size)
 {
     // 验证数据大小参数
     // 1KB = 1024字节, 1MB = 1024KB, 1GB = 1024MB
-    const qint64 MAX_FILE_SIZE = 4LL * 1024 * 1024 * 1024; // 限制最大4GB
+    //const qint64 MAX_FILE_SIZE = 4LL * 1024 * 1024 * 1024; // 限制最大4GB
     
-    return (size > 0 && size <= MAX_FILE_SIZE); // 文件大小必须为正数且不超过上限
+    //return (size > 0 && size <= MAX_FILE_SIZE); // 文件大小必须为正数且不超过上限
+    return(size > 0);
 }
 
 void ReceiveController::handleReceiveError(const QString &errorType, const QString &details)
