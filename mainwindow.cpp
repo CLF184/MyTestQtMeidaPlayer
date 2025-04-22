@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -14,6 +15,9 @@ MainWindow::MainWindow(QWidget *parent)
     
     // 设置窗口标题
     setWindowTitle(tr("音乐播放器"));
+
+    //设置工具栏
+    setupMenuBar();
     
     // 初始化managers和连接
     setupManagers();
@@ -78,9 +82,27 @@ void MainWindow::setupConnections()
     connect(player, &QMediaPlayer::positionChanged, 
             lyricController, &LyricController::onPositionChanged);
     
-    // 保留这个连接：媒体路径变化信号连接到歌词控制器
+    // 媒体路径变化信号连接到歌词控制器
     connect(m_mediaPlayerManager->getMediaModel(), &MediaModel::lyricChanged,
             lyricController, &LyricController::onLyricChanged);
+}
+
+void MainWindow::setupMenuBar(){
+    QMenu *toolmenu=new QMenu("工具");
+    ui->menubar->addMenu(toolmenu);
+    QAction *filetransferaction=new QAction("文件传输");
+    toolmenu->addAction(filetransferaction);
+
+    //打开新界面
+    connect(filetransferaction, &QAction::triggered, this,[this]{
+        FileTransfer *filetransfer_window=new FileTransfer();
+        filetransfer_window->show();
+    });
+}
+
+void MainWindow::onFileTransferActionTriggered()
+{
+    QMessageBox::information(this, tr("文件传输"), tr("文件传输功能即将实现"));
 }
 
 

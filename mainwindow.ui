@@ -37,6 +37,14 @@
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="fileTransfer">
+   <property name="text">
+    <string>文件传输</string>
+   </property>
+   <property name="toolTip">
+    <string>传输文件到设备</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

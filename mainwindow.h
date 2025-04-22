@@ -5,6 +5,7 @@
 #include "manager/mediaplayermanager.h"
 #include "manager/playlistmanager.h"
 #include "manager/lyricmanager.h"
+#include "subproject/filetransfer/filetransfer.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,6 +19,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void onFileTransferActionTriggered();
+
 private:
     Ui::MainWindow *ui;
     
@@ -28,5 +32,6 @@ private:
 
     void setupManagers();
     void setupConnections();
+    void setupMenuBar();
 };
 #endif // MAINWINDOW_H
