@@ -1,4 +1,4 @@
-QT       += core gui multimedia multimediawidgets concurrent sql
+QT       += core gui multimedia multimediawidgets concurrent sql core-private
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
@@ -22,6 +22,7 @@ SOURCES += \
     utils/mymediaplayer.cpp \
     utils/mysqlite.cpp \
     utils/lyricparser.cpp \
+    utils/urifix.cpp \
     manager/lyricmanager.cpp \
     manager/playlistmanager.cpp \
     manager/mediaplayermanager.cpp \
@@ -33,7 +34,7 @@ SOURCES += \
     subproject/filetransfer/model/receivemodel.cpp \
     subproject/filetransfer/controller/receivecontroller.cpp \
     subproject/filetransfer/views/receiveview.cpp \
-    subproject/filetransfer/manager/receivemanager.cpp
+    subproject/filetransfer/manager/receivemanager.cpp \
 
 HEADERS += \
     mainwindow.h \
@@ -49,6 +50,7 @@ HEADERS += \
     utils/mymediaplayer.h \
     utils/mysqlite.h \
     utils/lyricparser.h \
+    utils/urifix.h \
     manager/lyricmanager.h \
     manager/playlistmanager.h \
     manager/mediaplayermanager.h\
@@ -60,7 +62,8 @@ HEADERS += \
     subproject/filetransfer/model/receivemodel.h \
     subproject/filetransfer/controller/receivecontroller.h \
     subproject/filetransfer/views/receiveview.h \
-    subproject/filetransfer/manager/receivemanager.h
+    subproject/filetransfer/manager/receivemanager.h \
+    subproject/filetransfer/utils/urifix.h
     
 
 FORMS += \

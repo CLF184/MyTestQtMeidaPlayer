@@ -2,6 +2,7 @@
 #include "ui_playlistview.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include  <./utils/urifix.h>
 
 PlaylistView::PlaylistView(QWidget *parent) :
     QWidget(parent),
@@ -99,6 +100,7 @@ void PlaylistView::onOpenDirClicked()
         "", 
         QFileDialog::ShowDirsOnly
     );
+    m_currentDirectory=URIFix::toPath(m_currentDirectory);
 }
 
 void PlaylistView::onSearchClicked()
@@ -130,5 +132,5 @@ void PlaylistView::onSearchClicked()
     
     // 关闭消息框并显示完成消息
     msgBox.close();
-    QMessageBox::information(this, tr("搜索完成"), tr("音乐文件搜索完成！"));
+    QMessageBox::information(this, tr("搜索完成"), tr("媒体文件搜索完成！"));
 }

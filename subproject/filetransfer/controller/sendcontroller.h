@@ -31,6 +31,8 @@ private slots:
     void handleTransferCancelled();
     void handleTransferError(const QString &errorMsg);
     void handleAddPath(const QString &path);
+    void handleTransferNotActive();
+    void handeleTransferActive();
 
 private:
     SendModel *m_model;

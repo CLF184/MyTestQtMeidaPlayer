@@ -25,7 +25,7 @@ public:
     void setStatusMessage(const QString &message);
     void showError(const QString &errorMessage);
     void showMessage(const QString &message);
-    void updateProgress(int value);
+    void updateProgress(qint64 bytesSent, qint64 bytesTotal);
     void resetUI();
     void updateFileList(const QList<ReceivedFileItem> &files);
     void addFile(const QString &fileName, qint64 fileSize);

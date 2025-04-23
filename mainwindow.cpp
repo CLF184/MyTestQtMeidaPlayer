@@ -3,6 +3,11 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QMessageBox>
+#include <QToolBar>
+
+#ifdef Q_OS_ANDROID
+    #include <QtCore/private/qandroidextras_p.h>
+#endif
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle(tr("音乐播放器"));
 
     //设置工具栏
-    setupMenuBar();
+    setup();
     
     // 初始化managers和连接
     setupManagers();
@@ -87,15 +92,26 @@ void MainWindow::setupConnections()
             lyricController, &LyricController::onLyricChanged);
 }
 
-void MainWindow::setupMenuBar(){
-    QMenu *toolmenu=new QMenu("工具");
-    ui->menubar->addMenu(toolmenu);
-    QAction *filetransferaction=new QAction("文件传输");
-    toolmenu->addAction(filetransferaction);
+void MainWindow::setup(){
+    #if defined(Q_OS_ANDROID)
+        // For Android, use a toolbar
+        QToolBar* toolbar = new QToolBar(this);
+        addToolBar(toolbar);
+        
+        QAction *filetransferaction = new QAction("文件传输", this);
+        toolbar->addAction(filetransferaction);
+        QtAndroidPrivate::requestPermission("android.permission.WRITE_EXTERNAL_STORAGE");
+    #else
+        // For desktop platforms, use the traditional menu
+        QMenu *toolmenu = new QMenu("工具");
+        ui->menubar->addMenu(toolmenu);
+        QAction *filetransferaction = new QAction("文件传输", this);
+        toolmenu->addAction(filetransferaction);
+    #endif
 
-    //打开新界面
-    connect(filetransferaction, &QAction::triggered, this,[this]{
-        FileTransfer *filetransfer_window=new FileTransfer();
+    // Connect action - same for both platforms
+    connect(filetransferaction, &QAction::triggered, this, [this]{
+        FileTransfer *filetransfer_window = new FileTransfer();
         filetransfer_window->show();
     });
 }

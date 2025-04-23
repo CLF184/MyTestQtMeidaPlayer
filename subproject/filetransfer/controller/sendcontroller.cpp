@@ -12,6 +12,7 @@ SendController::SendController(SendModel *model, SendView *view, QObject *parent
     connect(m_view, &SendView::addFilesRequested, this, &SendController::handleAddFiles);
     connect(m_view, &SendView::removeFileRequested, this, &SendController::handleRemoveFile);
     connect(m_view, &SendView::clearFilesRequested, this, &SendController::handleClearFiles);
+    connect(m_view, &SendView::addPathRequested,this, &SendController::handleAddPath);
 
     // 连接模型信号到控制器槽
     connect(m_model, &SendModel::transferStarted, this, &SendController::handleTransferStarted);
@@ -20,6 +21,10 @@ SendController::SendController(SendModel *model, SendView *view, QObject *parent
     connect(m_model, &SendModel::transferCompleted, this, &SendController::handleTransferCompleted);
     connect(m_model, &SendModel::transferCancelled, this, &SendController::handleTransferCancelled);
     connect(m_model, &SendModel::transferError, this, &SendController::handleTransferError);
+    connect(m_model, &SendModel::transferStarted, this, &SendController::handeleTransferActive);
+    connect(m_model, &SendModel::transferError, this, &SendController::handleTransferNotActive);
+    connect(m_model, &SendModel::transferCancelled, this, &SendController::handleTransferNotActive);
+    connect(m_model, &SendModel::transferCompleted, this, &SendController::handleTransferNotActive);
 
     // 初始化视图
     updateFileList();
@@ -27,6 +32,14 @@ SendController::SendController(SendModel *model, SendView *view, QObject *parent
 
 SendController::~SendController()
 {
+}
+
+void SendController::handeleTransferActive(){
+    m_view->setTransferActive(true);
+}
+
+void SendController::handleTransferNotActive(){
+    m_view->setTransferActive(false);
 }
 
 void SendController::handleSendRequest()
@@ -126,7 +139,7 @@ void SendController::handleTransferStarted()
 void SendController::handleTransferProgress(int fileIndex, qint64 bytesSent, qint64 bytesTotal)
 {
     m_view->updateProgress(fileIndex, bytesSent, bytesTotal);
-    updateFileList();
+    //updateFileList();
 }
 
 void SendController::handleFileCompleted(int fileIndex)

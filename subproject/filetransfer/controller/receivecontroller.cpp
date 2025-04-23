@@ -162,14 +162,10 @@ void ReceiveController::handleFileReceiveStarted(const QString &fileName, qint64
 }
 
 // 处理文件接收进度，不再显示进度更新
-void ReceiveController::handleFileReceiveProgress(int fileIndex, qint64 bytesReceived, qint64 bytesTotal)
+void ReceiveController::handleFileReceiveProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
-    Q_UNUSED(fileIndex);
-    Q_UNUSED(bytesReceived);
-    Q_UNUSED(bytesTotal);
-    
-    // 不再更新进度条和文件列表
     // 接收完成后会通过handleFileReceiveCompleted处理
+    m_view->updateProgress(bytesReceived, bytesTotal);
 }
 
 void ReceiveController::handleFileReceiveCompleted(int fileIndex)
@@ -181,7 +177,7 @@ void ReceiveController::handleFileReceiveCompleted(int fileIndex)
     }
     
     // 完成后设置进度为100%
-    m_view->updateProgress(100);
+    // m_view->updateProgress(100);
     updateFileList();
 }
 

@@ -293,8 +293,7 @@ void ReceiveModel::onReadyRead()
         }
         
         // 发送进度更新信号
-        emit fileReceiveProgress(fileIndex, bytesReceived, fileSize);
-        emit fileTransferProgress(fileIndex, bytesReceived, fileSize);
+        emit fileReceiveProgress(bytesReceived, fileSize);
         
         // 检查文件是否接收完成
         if (bytesReceived >= fileSize) {

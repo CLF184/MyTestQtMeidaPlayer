@@ -1,4 +1,5 @@
 #include "subproject/filetransfer/views/sendview.h"
+#include "subproject/filetransfer/utils/urifix.h"
 #include "ui_SendView.h"
 #include <QFileDialog>
 #include <QMessageBox>
@@ -49,10 +50,13 @@ void SendView::updateFileList(const QList<FileItem> &files)
     }
     
     // 添加这行来更新UI状态，确保发送按钮状态正确
-    updateUIState(false);
+    //updateUIState(false);
+
+    bool hasFiles = ui->tableWidget_Files->rowCount() > 0;
+    ui->pushButton_Send->setEnabled(!ui->pushButton_Cancel->isEnabled() && hasFiles);
 }
 
-void SendView::updateProgress(int fileIndex, qint64 bytesSent, qint64 bytesTotal, int overallProgress)
+void SendView::updateProgress(int fileIndex, qint64 bytesSent, qint64 bytesTotal)
 {
     if (fileIndex >= 0 && fileIndex < ui->tableWidget_Files->rowCount()) {
         // 更新文件状态为"已完成"，而不是"发送中..."
@@ -62,26 +66,16 @@ void SendView::updateProgress(int fileIndex, qint64 bytesSent, qint64 bytesTotal
             ui->tableWidget_Files->setItem(fileIndex, 2, new QTableWidgetItem("发送中..."));
         }
         
-        // 如果提供了总体进度，则更新进度条
-        if (overallProgress >= 0) {
-            ui->progressBar->setValue(overallProgress);
-        }
-        
+        ui->progressBar->setValue((float)bytesSent/(float)bytesTotal * 100); // 更新进度条
+
+        //qDebug() << "更新进度条" << bytesSent << bytesTotal << bytesSent / bytesTotal * 100;
+
         // 更新状态信息
         setStatusMessage(QString("已发送: %1 (%2/%3)")
                         .arg(ui->tableWidget_Files->item(fileIndex, 0)->text())
                         .arg(formatFileSize(bytesSent))
                         .arg(formatFileSize(bytesTotal)));
     }
-}
-
-void SendView::updateOverallProgress(int progressPercentage, int completedFiles, int totalFiles)
-{
-    ui->progressBar->setValue(progressPercentage);
-    setStatusMessage(QString("文件传输进度: %1/%2 文件 (%3%)")
-                    .arg(completedFiles)
-                    .arg(totalFiles)
-                    .arg(progressPercentage));
 }
 
 void SendView::setStatusMessage(const QString &message)
@@ -213,10 +207,11 @@ void SendView::on_pushButton_AddPath_clicked()
 {
     selectPath= QFileDialog::getExistingDirectory(
         this, 
-        tr("选择音乐文件夹"),
+        tr("选择文件夹"),
         "", 
         QFileDialog::ShowDirsOnly
     );
+    selectPath=URIFix::toPath(selectPath);
     emit addPathRequested(selectPath);
 }
 

@@ -101,7 +101,7 @@
      <item>
       <widget class="QCheckBox" name="autoPlayCheckBox">
        <property name="text">
-        <string>自动连播</string>
+        <string>连播</string>
        </property>
       </widget>
      </item>

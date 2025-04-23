@@ -64,7 +64,7 @@ signals:
     void clientConnected(const QString &address);
     void clientDisconnected();
     void fileReceiveStarted(const QString &fileName, qint64 fileSize);
-    void fileReceiveProgress(int fileIndex, qint64 bytesReceived, qint64 bytesTotal);
+    void fileReceiveProgress(qint64 bytesReceived, qint64 bytesTotal);
     void fileReceiveCompleted(int fileIndex);
     void fileReceiveFailed(int fileIndex, const QString &errorMsg);
     

@@ -202,7 +202,7 @@ void SendModel::onBytesWritten(qint64 bytes)
     // 减少发送进度的频率，避免过于频繁的信号发射
     static int sentCount = 0;
     sentCount++;
-    if(sentCount % 25 == 0|| m_bytesSent == m_files[m_currentFileIndex].fileSize) {
+    if(sentCount % 10 == 0|| m_bytesSent >= m_files[m_currentFileIndex].fileSize) {
         sentCount = 0; // 重置计数器
         // 发送进度信号
         emit transferProgress(m_currentFileIndex, m_bytesSent, m_files[m_currentFileIndex].fileSize);

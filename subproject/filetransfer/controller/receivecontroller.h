@@ -29,7 +29,7 @@ private slots:
     void handleServerError(const QString &errorMsg);
     void handleNewConnection(const QString &address);
     void handleFileReceiveStarted(const QString &fileName, qint64 fileSize);
-    void handleFileReceiveProgress(int fileIndex, qint64 bytesReceived, qint64 bytesTotal);
+    void handleFileReceiveProgress(qint64 bytesReceived, qint64 bytesTotal);
     void handleFileReceiveCompleted(int fileIndex);
     void handleFileReceiveFailed(int fileIndex, const QString &errorMsg);
 

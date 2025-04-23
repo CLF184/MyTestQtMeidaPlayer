@@ -5,6 +5,7 @@
 #include <QUrl>
 #include <QStandardPaths>
 #include <QMessageBox>
+#include "../utils/urifix.h"
 
 ReceiveView::ReceiveView(QWidget *parent) :
     QWidget(parent),
@@ -55,9 +56,9 @@ void ReceiveView::setStatusMessage(const QString &message)
     ui->label_ReceiveStatus->setText(message);
 }
 
-void ReceiveView::updateProgress(int value)
+void ReceiveView::updateProgress(qint64 bytesSent, qint64 bytesTotal)
 {
-    ui->progressBar->setValue(value);
+    ui->progressBar->setValue((float)bytesSent / bytesTotal * 100);
 }
 
 void ReceiveView::resetUI()
@@ -117,15 +118,24 @@ void ReceiveView::on_pushButton_Browse_clicked()
                                                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
                                                    
     if (!dir.isEmpty()) {
-        ui->lineEdit_SavePath->setText(dir);
-        emit savePathChanged(dir);
+        // 使用URIFix修复路径
+        QString fixedDir = URIFix::toPath(dir);
+        ui->lineEdit_SavePath->setText(fixedDir);
+        qDebug()<<fixedDir;
+        emit savePathChanged(fixedDir);
     }
 }
 
 void ReceiveView::on_pushButton_OpenFolder_clicked()
 {
-    // 只发送信号，不直接处理文件夹打开操作
-    emit openFolderRequested();
+    // 确保使用修复后的路径
+    QString fixedPath = URIFix::toPath(ui->lineEdit_SavePath->text());
+    if (!fixedPath.isEmpty()) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fixedPath));
+    } else {
+        // 只发送信号，不直接处理文件夹打开操作
+        emit openFolderRequested();
+    }
 }
 
 void ReceiveView::on_pushButton_ClearList_clicked()

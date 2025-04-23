@@ -21,8 +21,7 @@ public:
 
     // 更新界面
     void updateFileList(const QList<FileItem> &files);
-    void updateProgress(int fileIndex, qint64 bytesSent, qint64 bytesTotal, int overallProgress = -1);
-    void updateOverallProgress(int progressPercentage, int completedFiles, int totalFiles);
+    void updateProgress(int fileIndex, qint64 bytesSent, qint64 bytesTotal);
     void setStatusMessage(const QString &message);
     void resetUI();
     void setTransferActive(bool active); // 新增公共方法
@@ -47,7 +46,6 @@ private slots:
     void on_pushButton_ClearAll_clicked();
     void on_pushButton_Send_clicked();
     void on_pushButton_Cancel_clicked();
-
     void on_pushButton_AddPath_clicked();
 
 private:

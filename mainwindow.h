@@ -32,6 +32,6 @@ private:
 
     void setupManagers();
     void setupConnections();
-    void setupMenuBar();
+    void setup();
 };
 #endif // MAINWINDOW_H
